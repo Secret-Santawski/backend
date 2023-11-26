@@ -19,7 +19,7 @@ To install and run the project, follow these steps:
 Clone the Repository:
 
 ```
-git clone https://github.com/your-username/secret-santa.git
+git clone https://github.com/Secret-Santawski/backend.git
 cd secret-santa
 ```
 
