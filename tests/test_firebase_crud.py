@@ -25,9 +25,9 @@ class TestFirebaseCRUD(unittest.TestCase):
         # Mock Firestore set method
         
         self.mock_db.collection.return_value.document.return_value.set.return_value = None
-
-        response = self.firebase_crud.create("test_collection", "test_document", {"data": "test"})
-        self.assertEqual(response, {"code": 200, "message": "Document created successfully"})
+        self.mock_db.collection.return_value.document.return_value.id = "test_id"
+        response = self.firebase_crud.create("test_collection", {"data": "test"})
+        self.assertEqual(response, {"code": 200, "message": "Document created successfully" , "id": "test_id"})
 
     def test_read_document_exists(self):
         # Mock Firestore get method for existing document
