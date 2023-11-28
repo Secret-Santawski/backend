@@ -72,8 +72,7 @@ def update_party(party_id):
     party_dict = asdict(party_data)
     firebase_crud = FirebaseCRUD()
     return firebase_crud.update("Party", party_id, party_dict)
-
-        
+  
 # Run Flask 
 if __name__ == '__main__':
     app.run()
