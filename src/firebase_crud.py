@@ -7,19 +7,22 @@ from google.api_core.exceptions import NotFound
 class FirebaseCRUD:
     def __init__(self):
         # Initialize Firebase app using credentials from the JSON file specified in an environment variable
-        cred_path = os.environ.get("FIREBASE_CREDENTIALS_PATH")
-        if not cred_path:
-            raise ValueError("The FIREBASE_CREDENTIALS_PATH environment variable is not set.")
+        if not firebase_admin._apps:
+            cred_path = os.environ.get("FIREBASE_CREDENTIALS_PATH")
+            if not cred_path:
+                raise ValueError("The FIREBASE_CREDENTIALS_PATH environment variable is not set.")
 
-        cred = credentials.Certificate(cred_path)
-        firebase_admin.initialize_app(cred)
+            cred = credentials.Certificate(cred_path)
+            firebase_admin.initialize_app(cred)
         self.db = firestore.client()
 
-    def create(self, collection, document_id, data):
+    def create(self, collection, data):
         """Creates a document in the specified collection with the provided data."""
         try:
-            self.db.collection(collection).document(document_id).set(data)
-            return {"code": 200, "message": "Document created successfully"}
+            doc_ref = self.db.collection(collection).document()
+            doc_ref.set(data)
+            doc_id = doc_ref.id
+            return {"code": 200, "message": "Document created successfully", "id": doc_id}
         except Exception as e:
             return {"code": 500, "message": f"Failed to create document: {str(e)}"}
 
