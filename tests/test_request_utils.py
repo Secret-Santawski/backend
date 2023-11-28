@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 from flask import Flask, request
 from dataclasses import dataclass, field
 from typing import List
-from utils.request_utils import create_instance_from_request
+from utilities.request_utils import create_instance_from_request
 
 
 app = Flask(__name__)
