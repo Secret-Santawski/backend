@@ -1,6 +1,11 @@
 from flask import Flask, request
 from .secret_santa import SecretSanta
 from .email_service import EmailService
+from .firebase_crud import FirebaseCRUD
+from models.party_model import Party
+
+from flask import jsonify
+
 
 # Create Flask app
 app = Flask(__name__)
@@ -23,6 +28,7 @@ def send_emails():
     # Return success status
     return {'Status': 'Success'}
 
+@app.route('/CreateParty/', methods=['POST'])
 def create_party():
     # Estrai i dati dalla richiesta
     try:
