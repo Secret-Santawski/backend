@@ -35,10 +35,17 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+## Download the Firebase Configuration File
+Go to your Firebase console. 
+Select the desired project. 
+Navigate to "Project settings" > "Service accounts" > "Firebase Admin SDK". 
+Click on "Generate new private key file" and save the json file.
+
 ## Set Environment Variables:
 
 - **SENDER_EMAIL**: The email address used to send out notifications.
 - **SENDER_PASSWORD**: The password for the email account.
+- **FIREBASE_SECRET_PATH**: The path for the json secrets downloaded from Firebase.
 
 ## Run the Application:
 
