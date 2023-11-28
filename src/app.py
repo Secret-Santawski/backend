@@ -53,6 +53,26 @@ def create_party():
     party_dict = asdict(party_data)
     firebase_crud = FirebaseCRUD()
     return firebase_crud.create("Party", party_dict)
+
+@app.route('/UpdateParty/<party_id>', methods=['PUT'])
+def update_party(party_id):
+    """
+    Updates a party.
+
+    Args:
+        party_id (str): The ID of the party to update.
+
+    Returns:
+        str: The status of the party update.
+    """
+    # Get data from request body and create Party object
+    party_data = create_instance_from_request(request, Party)
+
+    # Update party in Firebase
+    party_dict = asdict(party_data)
+    firebase_crud = FirebaseCRUD()
+    return firebase_crud.update("Party", party_id, party_dict)
+
         
 # Run Flask 
 if __name__ == '__main__':
