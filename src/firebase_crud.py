@@ -18,7 +18,7 @@ class FirebaseCRUD:
     def create(self, collection, document_id, data):
         """Creates a document in the specified collection with the provided data."""
         try:
-            self.db.collection(collection).document(document_id).set(data)
+            self.db.collection(collection).document(document_id).add(data)
             return {"code": 200, "message": "Document created successfully"}
         except Exception as e:
             return {"code": 500, "message": f"Failed to create document: {str(e)}"}

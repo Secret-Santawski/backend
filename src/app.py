@@ -23,6 +23,25 @@ def send_emails():
     # Return success status
     return {'Status': 'Success'}
 
+def create_party():
+    # Estrai i dati dalla richiesta
+    try:
+        data = request.get_json()
+        party_data = Party(**data)
+    except (TypeError, ValueError) as e:
+        return jsonify({"code": 400, "message": str(e)}), 400
+
+    # Crea un nuovo documento nella collezione "Party"
+    firebase_crud = FirebaseCRUD()
+    result = firebase_crud.create("Party", party_data.__dict__)
+
+    # Se il documento viene creato con successo, ritorna l'ID del documento
+    if result['code'] == 200:
+        return jsonify({"code": 200, "message": "Party created successfully", "id": result['id']}), 200
+    else:
+        return jsonify(result), result['code']
+
+        
 # Run Flask app in debug mode if the file is run as the main script
 if __name__ == '__main__':
     app.run(debug=True)
