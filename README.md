@@ -23,6 +23,12 @@ git clone https://github.com/Secret-Santawski/backend.git
 cd secret-santa
 ```
 
+## Create a virtual enviroment
+```
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
 ## Install Dependencies:
 
 ```
