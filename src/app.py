@@ -3,10 +3,8 @@ from src.secret_santa import SecretSanta
 from src.email_service import EmailService
 from src.firebase_crud import FirebaseCRUD
 from models.party_model import Party
+from models.user_model import User
 from utilities.request_utils import create_instance_from_request
-
-
-from flask import jsonify
 from dataclasses import asdict
 
 
@@ -72,7 +70,38 @@ def update_party(party_id):
     party_dict = asdict(party_data)
     firebase_crud = FirebaseCRUD()
     return firebase_crud.update("Party", party_id, party_dict)
-  
+
+@app.route('/CreateUser/<party_id>', methods=['POST'])
+def create_user(party_id):
+    """
+    Creates a new user.
+
+    Args:
+        party_id (str): The ID of the party to which the user belongs.
+    
+    Returns:
+        str: The ID of the created user.
+    """
+
+
+    # Get data from request body and create User object
+    user_data = create_instance_from_request(request, User)
+    
+    # Create user in Firebase
+    user_dict = asdict(user_data)
+    firebase_crud = FirebaseCRUD()
+    message = firebase_crud.create("User", user_dict)
+
+    # If he's the first user to join the party, update the party's ownerId with his ID
+    if message['code'] == 200:
+        party = firebase_crud.read("Party", party_id)
+        print(party)
+        if party['data']['ownerId'] == "":
+            firebase_crud.update("Party", party_id, {'ownerId': message['id']})
+    
+    return message
+
+
 # Run Flask 
 if __name__ == '__main__':
     app.run()
