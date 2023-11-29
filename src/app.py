@@ -95,8 +95,7 @@ def create_user(party_id):
     # If he's the first user to join the party, update the party's ownerId with his ID
     if message['code'] == 200:
         party = firebase_crud.read("Party", party_id)
-        print(party)
-        if party['data']['ownerId'] == "":
+        if party['code'] == 200 and party['data']['ownerId'] == '':
             firebase_crud.update("Party", party_id, {'ownerId': message['id']})
     
     return message
