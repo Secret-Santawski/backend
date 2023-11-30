@@ -86,6 +86,7 @@ def create_user(party_id):
 
     # Get data from request body and create User object
     user_data = create_instance_from_request(request, User)
+    user_data.party_id = party_id
     
     # Create user in Firebase
     user_dict = asdict(user_data)

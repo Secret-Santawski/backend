@@ -96,7 +96,8 @@ class TestApp(unittest.TestCase):
         test_data = {
             'username': 'Test User',
             'email': 'test@test.com',
-            'suggested_categories': ['Food', 'Games']
+            'suggested_categories': ['Food', 'Games'],
+            'party_id': 'party123'
         }
 
         # Call the create_user endpoint
