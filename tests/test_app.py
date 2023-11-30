@@ -112,6 +112,38 @@ class TestApp(unittest.TestCase):
         # Verify that the response is correct
         self.assertEqual(response.get_json(), {'code': 200, 'message': 'Document created successfully', 'id': '123'})
         self.assertEqual(response.status_code, 200)
-        
+    
+    @patch('src.app.FirebaseCRUD')
+    def test_update_user(self, mock_firebase_crud):
+        # Setup the mock for FirebaseCRUD
+        mock_firebase_crud_instance = mock_firebase_crud.return_value
+        mock_firebase_crud_instance.update.return_value = {'code': 200, 'message': 'Document updated successfully'}
+
+        test_data = {
+            'username': 'Test User',
+            'email': 'test@test.com',
+            'suggested_categories': ['Food', 'Games'],
+            'party_id': 'party1234'  # Include party_id in test data
+        }
+
+        # Expected data without 'party_id'
+        expected_data = {
+            'username': 'Test User',
+            'email': 'test@test.com',
+            'suggested_categories': ['Food', 'Games']
+            # 'party_id' is intentionally omitted
+        }
+
+        # Call the update_user endpoint
+        response = self.app.put('/UpdateUser/123', json=test_data)
+
+        # Verify that FirebaseCRUD.update was called with the correct parameters
+        mock_firebase_crud_instance.update.assert_called_once()
+        called_args, _ = mock_firebase_crud_instance.update.call_args
+        self.assertEqual(called_args[0], 'User')
+        self.assertEqual(called_args[1], '123')
+        self.assertDictEqual(called_args[2], expected_data) 
+
+
 if __name__ == '__main__':
     unittest.main()
