@@ -96,7 +96,6 @@ class TestApp(unittest.TestCase):
         test_data = {
             'username': 'Test User',
             'email': 'test@test.com',
-            'ownership': False,
             'suggested_categories': ['Food', 'Games'],
             'party_id': 'party123'
         }

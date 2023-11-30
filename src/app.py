@@ -86,6 +86,7 @@ def create_user(party_id):
 
     # Get data from request body and create User object
     user_data = create_instance_from_request(request, User)
+    user_data.party_id = party_id
     
     # Create user in Firebase
     user_dict = asdict(user_data)
@@ -95,8 +96,7 @@ def create_user(party_id):
     # If he's the first user to join the party, update the party's ownerId with his ID
     if message['code'] == 200:
         party = firebase_crud.read("Party", party_id)
-        print(party)
-        if party['data']['ownerId'] == "":
+        if party['code'] == 200 and party['data']['ownerId'] == '':
             firebase_crud.update("Party", party_id, {'ownerId': message['id']})
     
     return message
