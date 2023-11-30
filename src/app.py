@@ -101,7 +101,28 @@ def create_user(party_id):
     
     return message
 
+@app.route('/UpdateUser/<user_id>', methods=['PUT'])
+def update_user(user_id):
+    """
+    Updates a user.
+
+    Args:
+        user_id (str): The ID of the user to update.
+
+    Returns:
+        str: The status of the user update.
+    """
+
+    # Create User object from request data
+    user_data = create_instance_from_request(request, User)
+
+    # Convert to dict and remove 'party_id'
+    user_dict = {key: value for key, value in asdict(user_data).items() if key != 'party_id'}
+
+    # Update user in Firebase
+    firebase_crud = FirebaseCRUD()
+    return firebase_crud.update("User", user_id, user_dict)
 
 # Run Flask 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=5001)
