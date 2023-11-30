@@ -144,6 +144,28 @@ class TestApp(unittest.TestCase):
         self.assertEqual(called_args[1], '123')
         self.assertDictEqual(called_args[2], expected_data) 
 
+        # Verify that the response is correct
+        self.assertEqual(response.get_json(), {'code': 200, 'message': 'Document updated successfully'})
+        self.assertEqual(response.status_code, 200)
+
+    @patch('src.app.FirebaseCRUD')
+    def test_delete_user(self, mock_firebase_crud):
+        # Setup the mock for FirebaseCRUD
+        mock_firebase_crud_instance = mock_firebase_crud.return_value
+        mock_firebase_crud_instance.delete.return_value = {'code': 200, 'message': 'Document deleted successfully'}
+
+        # Call the delete_user endpoint
+        response = self.app.delete('/DeleteUser/123')
+
+        # Verify that FirebaseCRUD.delete was called with the correct parameters
+        mock_firebase_crud_instance.delete.assert_called_once()
+        called_args, _ = mock_firebase_crud_instance.delete.call_args
+        self.assertEqual(called_args[0], 'User')
+        self.assertEqual(called_args[1], '123')
+
+        # Verify that the response is correct
+        self.assertEqual(response.get_json(), {'code': 200, 'message': 'Document deleted successfully'})
+        self.assertEqual(response.status_code, 200)
 
 if __name__ == '__main__':
     unittest.main()

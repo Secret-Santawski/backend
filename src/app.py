@@ -123,6 +123,23 @@ def update_user(user_id):
     firebase_crud = FirebaseCRUD()
     return firebase_crud.update("User", user_id, user_dict)
 
+@app.route('/DeleteUser/<user_id>', methods=['DELETE'])
+def delete_user(user_id):
+    """
+    Deletes a user.
+
+    Args:
+        user_id (str): The ID of the user to delete.
+
+    Returns:
+        str: The status of the user deletion.
+    """
+
+    # Delete user in Firebase
+    firebase_crud = FirebaseCRUD()
+    return firebase_crud.delete("User", user_id)
+
+
 # Run Flask 
 if __name__ == '__main__':
     app.run(port=5001)
