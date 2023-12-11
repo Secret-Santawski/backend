@@ -85,8 +85,7 @@ class TestApp(unittest.TestCase):
         mock_firebase_crud_instance.update.assert_called_once()
         called_args, _ = mock_firebase_crud_instance.update.call_args
         self.assertEqual(called_args[0], "Party")
-        self.assertEqual(called_args[1], "123")
-        self.assertDictEqual(called_args[2], test_data)
+        self.assertEqual(called_args[1], test_data)
 
         # Verify that the response is correct
         self.assertEqual(
