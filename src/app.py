@@ -15,7 +15,7 @@ app = Flask(__name__)
 email_service = EmailService()
 
 
-@app.route('/SecretSanta/', methods=['POST'])
+@app.route("/SecretSanta/", methods=["POST"])
 def send_emails():
     """
     Sends emails to assigned recipients based on the received data.
@@ -25,19 +25,19 @@ def send_emails():
     """
     # Get data from request body
     data = request.get_json()
-    
+
     # Create SecretSanta object with received data and email service
     secret_santa = SecretSanta(data, email_service)
-    
+
     # Assign recipients and send emails
     secret_santa.assign_and_send_emails()
-    
+
     # Return success status
-    return {'Status': 'Success'}
+    return {"Status": "Success"}
 
 
-@app.route('/CreateParty/', methods=['POST'])
-def create_party(): 
+@app.route("/CreateParty/", methods=["POST"])
+def create_party():
     """
     Creates a new party.
 
@@ -52,7 +52,8 @@ def create_party():
     firebase_crud = FirebaseCRUD()
     return firebase_crud.create("Party", party_dict)
 
-@app.route('/UpdateParty/<party_id>', methods=['PUT'])
+
+@app.route("/UpdateParty/<party_id>", methods=["PUT"])
 def update_party(party_id):
     """
     Updates a party.
@@ -71,37 +72,38 @@ def update_party(party_id):
     firebase_crud = FirebaseCRUD()
     return firebase_crud.update("Party", party_id, party_dict)
 
-@app.route('/CreateUser/<party_id>', methods=['POST'])
+
+@app.route("/CreateUser/<party_id>", methods=["POST"])
 def create_user(party_id):
     """
     Creates a new user.
 
     Args:
         party_id (str): The ID of the party to which the user belongs.
-    
+
     Returns:
         str: The ID of the created user.
     """
 
-
     # Get data from request body and create User object
     user_data = create_instance_from_request(request, User)
     user_data.party_id = party_id
-    
+
     # Create user in Firebase
     user_dict = asdict(user_data)
     firebase_crud = FirebaseCRUD()
     message = firebase_crud.create("User", user_dict)
 
     # If he's the first user to join the party, update the party's ownerId with his ID
-    if message['code'] == 200:
+    if message["code"] == 200:
         party = firebase_crud.read("Party", party_id)
-        if party['code'] == 200 and party['data']['ownerId'] == '':
-            firebase_crud.update("Party", party_id, {'ownerId': message['id']})
-    
+        if party["code"] == 200 and party["data"]["ownerId"] == "":
+            firebase_crud.update("Party", party_id, {"ownerId": message["id"]})
+
     return message
 
-@app.route('/UpdateUser/<user_id>', methods=['PUT'])
+
+@app.route("/UpdateUser/<user_id>", methods=["PUT"])
 def update_user(user_id):
     """
     Updates a user.
@@ -117,13 +119,16 @@ def update_user(user_id):
     user_data = create_instance_from_request(request, User)
 
     # Convert to dict and remove 'party_id'
-    user_dict = {key: value for key, value in asdict(user_data).items() if key != 'party_id'}
+    user_dict = {
+        key: value for key, value in asdict(user_data).items() if key != "party_id"
+    }
 
     # Update user in Firebase
     firebase_crud = FirebaseCRUD()
     return firebase_crud.update("User", user_id, user_dict)
 
-@app.route('/DeleteUser/<user_id>', methods=['DELETE'])
+
+@app.route("/DeleteUser/<user_id>", methods=["DELETE"])
 def delete_user(user_id):
     """
     Deletes a user.
@@ -140,6 +145,43 @@ def delete_user(user_id):
     return firebase_crud.delete("User", user_id)
 
 
-# Run Flask 
-if __name__ == '__main__':
+# Get all parties where you user email is accociated with
+# Get email as a query parameter
+@app.route("/GetParties/", methods=["GET"])
+def get_parties():
+    """
+    Gets all parties where the user with the specified email is associated with.
+
+    Returns:
+        dict: A dictionary containing the status of the operation and the parties.
+    """
+
+    # Get email from query parameter
+    user_email = request.args.get("email")
+
+    # Ensure user_email is provided
+    if not user_email:
+        return {"code": 400, "message": "User email is required"}
+
+    # Get all the party_id from users with the specified email
+    # and use them to get the parties names
+    firebase_crud = FirebaseCRUD()
+    users = firebase_crud.where("User", "email", "==", user_email)
+    if users["code"] == 200:
+        parties = []
+        for user in users["data"]:
+            party = firebase_crud.read("Party", user["party_id"])
+            if party["code"] == 200:
+                parties.append(party["data"])
+        return {
+            "code": 200,
+            "message": "Parties retrieved successfully",
+            "data": parties,
+        }
+    else:
+        return users
+
+
+# Run Flask
+if __name__ == "__main__":
     app.run(port=5001)
