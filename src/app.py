@@ -2,10 +2,11 @@ from flask import Flask, request
 from src.secret_santa import SecretSanta
 from src.email_service import EmailService
 from src.firebase_crud import FirebaseCRUD
-from models.party_model import Party
+from models.party_model import Party, PartyRequest
 from models.user_model import User
 from utilities.request_utils import create_instance_from_request
 from dataclasses import asdict
+import os
 
 
 # Create Flask app
@@ -44,13 +45,13 @@ def create_party():
     Returns:
         str: The ID of the created party.
     """
+
     # Get data from request body and create Party object
-    party_data = create_instance_from_request(request, Party)
+    party_data = create_instance_from_request(request, PartyRequest)
 
     # Create party in Firebase
-    party_dict = asdict(party_data)
     firebase_crud = FirebaseCRUD()
-    return firebase_crud.create("Party", party_dict)
+    return firebase_crud.create("Party", asdict(party_data))
 
 
 @app.route("/UpdateParty/<party_id>", methods=["PUT"])
@@ -65,12 +66,11 @@ def update_party(party_id):
         str: The status of the party update.
     """
     # Get data from request body and create Party object
-    party_data = create_instance_from_request(request, Party)
+    party_data = create_instance_from_request(request, PartyRequest)
 
     # Update party in Firebase
-    party_dict = asdict(party_data)
     firebase_crud = FirebaseCRUD()
-    return firebase_crud.update("Party", party_id, party_dict)
+    return firebase_crud.update("Party", asdict(party_data))
 
 
 @app.route("/CreateUser/<party_id>", methods=["POST"])
@@ -118,7 +118,7 @@ def update_user(user_id):
     # Create User object from request data
     user_data = create_instance_from_request(request, User)
 
-    # Convert to dict and remove 'party_id'
+    # Convert to dict
     user_dict = {
         key: value for key, value in asdict(user_data).items() if key != "party_id"
     }
@@ -184,4 +184,4 @@ def get_parties():
 
 # Run Flask
 if __name__ == "__main__":
-    app.run(port=5001)
+    app.run(port=int(os.environ.get("PORT", 5000)), host="0.0.0.0", debug=True)
