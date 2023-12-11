@@ -6,6 +6,7 @@ from models.party_model import Party
 from models.user_model import User
 from utilities.request_utils import create_instance_from_request
 from dataclasses import asdict
+import os
 
 
 # Create Flask app
@@ -184,4 +185,4 @@ def get_parties():
 
 # Run Flask
 if __name__ == "__main__":
-    app.run(port=5001)
+    app.run(port=int(os.environ.get("PORT", 5000)), host="0.0.0.0", debug=True)
