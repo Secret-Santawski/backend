@@ -2,7 +2,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
 from src.app import app
-from models.party_model import Party
+from models.party_model import Party, PartyRequest
 from models.user_model import User
 
 
@@ -43,9 +43,7 @@ class TestApp(unittest.TestCase):
         test_data = {
             "name": "Test Party",
             "budget": 100,
-            "categories": ["Food", "Games"],
-            "ownerId": "owner123",
-            "closed": False,
+            "categories": ["Food", "Games"]
         }
 
         # Call the create_party endpoint
@@ -77,9 +75,7 @@ class TestApp(unittest.TestCase):
         test_data = {
             "name": "Test Party",
             "budget": 100,
-            "categories": ["Food", "Games"],
-            "ownerId": "owner123",
-            "closed": False,
+            "categories": ["Food", "Games"]
         }
 
         # Call the update_party endpoint
@@ -89,8 +85,7 @@ class TestApp(unittest.TestCase):
         mock_firebase_crud_instance.update.assert_called_once()
         called_args, _ = mock_firebase_crud_instance.update.call_args
         self.assertEqual(called_args[0], "Party")
-        self.assertEqual(called_args[1], "123")
-        self.assertDictEqual(called_args[2], test_data)
+        self.assertEqual(called_args[1], test_data)
 
         # Verify that the response is correct
         self.assertEqual(
