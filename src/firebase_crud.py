@@ -1,4 +1,5 @@
 import os
+import json
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
@@ -7,15 +8,16 @@ from google.api_core.exceptions import NotFound
 
 class FirebaseCRUD:
     def __init__(self):
-        # Initialize Firebase app using credentials from the JSON file specified in an environment variable
+        # Initialize Firebase app
         if not firebase_admin._apps:
-            cred_path = os.environ.get("FIREBASE_CREDENTIALS_PATH")
-            if not cred_path:
-                raise ValueError(
-                    "The FIREBASE_CREDENTIALS_PATH environment variable is not set."
+            # Use credentials from the JSON file specified in an environment variable
+            secret_credentials = json.loads(os.environ.get("FIREBASE_CREDENTIALS"))
+            if not secret_credentials:
+                raise Exception(
+                    "Firebase credentials not found. Please set the FIREBASE_CREDENTIALS environment variable."
                 )
 
-            cred = credentials.Certificate(cred_path)
+            cred = credentials.Certificate(secret_credentials)
             firebase_admin.initialize_app(cred)
         self.db = firestore.client()
 
