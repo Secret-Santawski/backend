@@ -182,6 +182,60 @@ def get_parties():
         return users
 
 
+@app.route("/GetParty/<party_id>/<owner_id>", methods=["GET"])
+@app.route("/GetParty/<party_id>", methods=["GET"])
+def get_party(party_id, owner_id=None):
+    """
+    Gets a party with the specified ID.
+
+    Args:
+        party_id (str): The ID of the party to get.
+        owner_id (str): The ID of the owner of the party.
+
+    Returns:
+        dict: A dictionary containing the party information.
+    """
+    # Get party from Firebase
+    print(party_id)
+    firebase_crud = FirebaseCRUD()
+    party = firebase_crud.read("Party", party_id)
+
+    # Ensure party exists
+    if party["code"] == 200:
+        # Get all users from Firebase associated with the party
+        users = firebase_crud.where("User", "party_id", "==", party_id)
+        if users["code"] == 200:
+            party["data"]["users"] = users["data"]
+            # if owner id is not null and the owner id is in the users list, then return all party and user data including the owner id and the user ids
+            if owner_id is not None and any(user["id"] == owner_id for user in users["data"]):
+                return {
+                    "code": 200,
+                    "message": "Party retrieved successfully",
+                    "data": party["data"],
+                }
+            # if owner id is not null and the owner id is not in the users list, then return error
+            elif owner_id is not None and not any(user["id"] == owner_id for user in users["data"]):
+                return {
+                    "code": 400,
+                    "message": "Owner id is not valid",
+                }
+            # if owner id is null, then return only the party data without the owner_id and the user ids
+            else:
+                return {
+                    "code": 200,
+                    "message": "Party retrieved successfully",
+                    "data": {
+                        key: [
+                            {k: v for k, v in user.items() if k != "id"}
+                            for user in value
+                        ] if key == "users" else value
+                        for key, value in party["data"].items()
+                        if key not in ["ownerId"]
+                    }
+                }
+    return party
+
+
 # Run Flask
 if __name__ == "__main__":
     app.run(port=5000, host="0.0.0.0", debug=True)

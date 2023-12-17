@@ -39,11 +39,14 @@ class FirebaseCRUD:
         """Reads a document from the specified collection."""
         try:
             doc = self.db.collection(collection).document(document_id).get()
+            # add document ID to data
             if doc.exists:
+                data = doc.to_dict()
+                data["id"] = doc.id
                 return {
                     "code": 200,
                     "message": "Document read successfully",
-                    "data": doc.to_dict(),
+                    "data": data,
                 }
             else:
                 return {"code": 404, "message": "Document not found"}
@@ -74,10 +77,16 @@ class FirebaseCRUD:
         """Retrieves all documents from the specified collection that match the provided query."""
         try:
             docs = self.db.collection(collection).where(field, operator, value).get()
+            # add document ID to data
+            data = []
+            for doc in docs:
+                doc_data = doc.to_dict()
+                doc_data["id"] = doc.id
+                data.append(doc_data)
             return {
                 "code": 200,
                 "message": "Documents retrieved successfully",
-                "data": [doc.to_dict() for doc in docs],
+                "data": data,
             }
         except Exception as e:
             return {"code": 500, "message": f"Failed to retrieve documents: {str(e)}"}
