@@ -230,6 +230,108 @@ class TestApp(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
+    @patch("src.app.FirebaseCRUD")
+    def test_get_party(self, mock_firebase_crud):
+        # Setup the mock for FirebaseCRUD
+        mock_firebase_crud_instance = mock_firebase_crud.return_value
+        mock_firebase_crud_instance.read.return_value = {
+            "code": 200,
+            "data": {
+                "name": "Test Party",
+                "budget": 100,
+                "categories": ["Food", "Games"],
+                "ownerId": "user123",
+            },
+        }
+        mock_firebase_crud_instance.where.return_value = {
+            "code": 200,
+            "data": [
+                {"id": "user123", "name": "User 1"},
+                {"id": "user456", "name": "User 2"},
+            ],
+        }
+
+        # Call the get_party endpoint without owner_id
+        response = self.app.get("/GetParty/123")
+
+        # Verify that FirebaseCRUD.read was called with the correct parameters
+        mock_firebase_crud_instance.read.assert_called_once_with("Party", "123")
+
+        # Verify that FirebaseCRUD.where was called with the correct parameters
+        mock_firebase_crud_instance.where.assert_called_once_with(
+            "User", "party_id", "==", "123"
+        )
+
+        # Verify that the response is correct
+        self.assertEqual(
+            response.get_json(),
+            {
+                "code": 200,
+                "message": "Party retrieved successfully",
+                "data": {
+                    "name": "Test Party",
+                    "budget": 100,
+                    "categories": ["Food", "Games"],
+                    "users": [
+                        {"name": "User 1"},
+                        {"name": "User 2"},
+                    ],
+                },
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+
+        # Call the get_party endpoint with valid owner_id
+        response = self.app.get("/GetParty/123/user123")
+
+        # Verify that FirebaseCRUD.read was called with the correct parameters
+        mock_firebase_crud_instance.read.assert_called_with("Party", "123")
+
+        # Verify that FirebaseCRUD.where was called with the correct parameters
+        mock_firebase_crud_instance.where.assert_called_with(
+            "User", "party_id", "==", "123"
+        )
+
+        # Verify that the response is correct
+        self.assertEqual(
+            response.get_json(),
+            {
+                "code": 200,
+                "message": "Party retrieved successfully",
+                "data": {
+                    "name": "Test Party",
+                    "budget": 100,
+                    "categories": ["Food", "Games"],
+                    "ownerId": "user123",
+                    "users": [
+                        {"id": "user123" ,"name": "User 1"},
+                        {"id": "user456", "name": "User 2"},
+                    ],
+                },
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+
+        # Call the get_party endpoint with invalid owner_id
+        response = self.app.get("/GetParty/123/invalid_owner")
+
+        # Verify that FirebaseCRUD.read was called with the correct parameters
+        mock_firebase_crud_instance.read.assert_called_with("Party", "123")
+
+        # Verify that FirebaseCRUD.where was called with the correct parameters
+        mock_firebase_crud_instance.where.assert_called_with(
+            "User", "party_id", "==", "123"
+        )
+
+        # Verify that the response is correct
+        self.assertEqual(
+            response.get_json(),
+            {
+                "code": 400,
+                "message": "Owner id is not valid",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
 
 if __name__ == "__main__":
     unittest.main()
