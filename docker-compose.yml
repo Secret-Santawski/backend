@@ -8,6 +8,6 @@ services:
     volumes:
       - .:/workspaces/backend
     environment:
-      - FIREBASE_CREDENTIALS_PATH
+      - FIREBASE_CREDENTIALS
       - SENDER_EMAIL
       - SENDER_PASSWORD
