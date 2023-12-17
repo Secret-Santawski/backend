@@ -3,3 +3,4 @@ flask_cors
 firebase-admin
 google-cloud-firestore
 google-api-core
+gunicorn
