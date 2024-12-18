@@ -7,7 +7,7 @@ from models.user_model import User
 from utilities.request_utils import create_instance_from_request
 from dataclasses import asdict
 import os
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 
 
 # Create Flask app
@@ -16,9 +16,8 @@ app = Flask(__name__)
 # Create email service
 email_service = EmailService()
 
-# Enable CORS with specific origins
-CORS(app, resources={r"/*": {"origins": "*"}})
-
+cors = CORS(app) # allow CORS for all domains on all routes.
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 @app.route("/SecretSanta/", methods=["POST"])
 @cross_origin()
