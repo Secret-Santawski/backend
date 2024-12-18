@@ -16,8 +16,8 @@ app = Flask(__name__)
 # Create email service
 email_service = EmailService()
 
-# Enable CORS
-CORS(app)
+# Enable CORS with specific origins
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 @app.route("/SecretSanta/", methods=["POST"])
 def send_emails():
