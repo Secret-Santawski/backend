@@ -19,8 +19,13 @@ email_service = EmailService()
 # Enable CORS with specific origins
 CORS(app, resources={r"/*": {"origins": "*"}})
 
+
 @app.route("/SecretSanta/", methods=["POST"])
+@cross_origin()
 def send_emails():
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add("Access-Control-Allow-Headers", "*")
+    response.headers.add("Access-Control-Allow-Methods", "*")
     """
     Sends emails to assigned recipients based on the received data.
 
