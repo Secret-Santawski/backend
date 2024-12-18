@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, make_response
 from src.secret_santa import SecretSanta
 from src.email_service import EmailService
 from src.firebase_crud import FirebaseCRUD
@@ -22,15 +22,18 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 @app.route("/SecretSanta/", methods=["POST"])
 @cross_origin()
 def send_emails():
-    response.headers.add("Access-Control-Allow-Origin", "*")
-    response.headers.add("Access-Control-Allow-Headers", "*")
-    response.headers.add("Access-Control-Allow-Methods", "*")
     """
     Sends emails to assigned recipients based on the received data.
 
     Returns:
         dict: A dictionary indicating the status of the email sending process.
     """
+
+    response = make_response()
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add("Access-Control-Allow-Headers", "*")
+    response.headers.add("Access-Control-Allow-Methods", "*")
+    
     # Get data from request body
     data = request.get_json()
 
